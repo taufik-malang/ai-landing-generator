@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Landing Page Generator</title>
+</head>
+<body>
+
+<h2>?? AI Landing Page Generator</h2>
+
+<input id="produk" placeholder="Nama Produk"><br><br>
+<input id="target" placeholder="Target Market"><br><br>
+<input id="harga" placeholder="Harga"><br><br>
+<textarea id="masalah" placeholder="Masalah"></textarea><br><br>
+<textarea id="benefit" placeholder="Benefit"></textarea><br><br>
+
+<button onclick="generate()">?? Generate</button>
+
+<pre id="hasil"></pre>
+
+<script>
+async function generate() {
+  const produk = document.getElementById("produk").value;
+  const target = document.getElementById("target").value;
+  const harga = document.getElementById("harga").value;
+  const masalah = document.getElementById("masalah").value;
+  const benefit = document.getElementById("benefit").value;
+
+  const res = await fetch("/api/generate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      produk, target, harga, masalah, benefit
+    })
+  });
+
+  const data = await res.json();
+  document.getElementById("hasil").innerText = data.result;
+}
+</script>
+
+</body>
+</html>
