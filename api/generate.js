@@ -1,11 +1,12 @@
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
+  try {
+    if (req.method !== "POST") {
+      return res.status(405).json({ message: "Method not allowed" });
+    }
 
-  const { produk, target, harga, masalah, benefit } = req.body;
+    const { produk, target, harga, masalah, benefit } = req.body;
 
-  const prompt = `
+    const prompt = `
 Buat landing page HIGH CONVERT:
 
 Produk: ${produk}
@@ -19,39 +20,35 @@ Hook, Problem, Solution, Benefit, Social Proof, Offer, CTA
 Bahasa santai, persuasif
 `;
 
-  try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + process.env.OPENAI_API_KEY
       },
       body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        input: prompt
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ]
       })
     });
 
     const data = await response.json();
 
-    console.log("FULL RESPONSE:", JSON.stringify(data));
+    console.log("OPENAI RESPONSE:", data);
 
-    // 🔥 ambil semua kemungkinan
-    let text = "";
-
-    if (data.output_text) {
-      text = data.output_text;
-    } else if (data.output && data.output.length > 0) {
-      text = data.output[0]?.content?.[0]?.text || "";
-    }
-
-    if (!text) {
-      text = "❌ Gagal generate. Cek API key atau response OpenAI.";
-    }
+    const text =
+      data.choices?.[0]?.message?.content ||
+      "❌ Gagal generate. Cek API key atau limit.";
 
     res.status(200).json({ result: text });
 
   } catch (error) {
+    console.error("ERROR:", error);
     res.status(500).json({ error: error.message });
   }
 }
