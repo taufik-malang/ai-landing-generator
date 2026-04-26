@@ -34,12 +34,22 @@ Bahasa santai, persuasif
 
     const data = await response.json();
 
-    // 🔥 FIX DI SINI
-    const text = data.output_text || "Gagal generate, coba lagi";
+    console.log("FULL RESPONSE:", JSON.stringify(data));
 
-    res.status(200).json({
-      result: text
-    });
+    // 🔥 ambil semua kemungkinan
+    let text = "";
+
+    if (data.output_text) {
+      text = data.output_text;
+    } else if (data.output && data.output.length > 0) {
+      text = data.output[0]?.content?.[0]?.text || "";
+    }
+
+    if (!text) {
+      text = "❌ Gagal generate. Cek API key atau response OpenAI.";
+    }
+
+    res.status(200).json({ result: text });
 
   } catch (error) {
     res.status(500).json({ error: error.message });
