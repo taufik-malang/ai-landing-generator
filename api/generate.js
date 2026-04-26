@@ -34,8 +34,11 @@ Bahasa santai, persuasif
 
     const data = await response.json();
 
+    // 🔥 FIX DI SINI
+    const text = data.output_text || "Gagal generate, coba lagi";
+
     res.status(200).json({
-      result: data.output[0].content[0].text
+      result: text
     });
 
   } catch (error) {
